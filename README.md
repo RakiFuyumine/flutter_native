@@ -1,16 +1,63 @@
 # testsdk
 
-A new Flutter application.
+Example of using native in flutter
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### create channel to communicate
+``static const platform = const MethodChannel('samples.flutter.io/native');``
 
-A few resources to get you started if this is your first Flutter project:
+### make call in method
+``final int result = await platform.invokeMethod('getBatteryLevel');``
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### implement in android MainActivity.java
+```
+private static final String CHANNEL = "samples.flutter.io/native";
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+
+    super.onCreate(savedInstanceState);
+
+    new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
+            (call, result) -> {
+              // implement code for each call
+              if (call.method.equals("getBatteryLevel")) {
+                int batteryLevel = getBatteryLevel();
+
+                if (batteryLevel != -1) {
+                  result.success(batteryLevel);
+                } else {
+                  result.error("UNAVAILABLE", "Battery level not available.", null);
+                }
+              } else {
+                result.notImplemented();
+              }
+            });
+  }
+```
+### implement in ios 
+#### add header to Runner-Bridging-Header.h
+``#import "../Flutter/Flutter.framework/Headers/Flutter.h"``
+#### implement code in AppDelegate.swift
+```
+override func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
+    let controller : FlutterViewController = window?.rootViewController as! FlutterViewController;
+      let batteryChannel = FlutterMethodChannel.init(name: "samples.flutter.io/native",
+                                                     binaryMessenger: controller.binaryMessenger);
+    
+      batteryChannel.setMethodCallHandler({
+        (call, result) -> Void in
+        if ("getBatteryLevel" == call.method) {
+            self.receiveBatteryLevel(result: result);
+        } else {
+          result(FlutterMethodNotImplemented);
+        }
+      });
+     
+      return true
+  }
+```

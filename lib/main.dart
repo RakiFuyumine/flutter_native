@@ -25,12 +25,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static const platform = const MethodChannel('samples.flutter.io/battery');
+  //create channel to communicate with device, must be unique
+  static const platform = const MethodChannel('samples.flutter.io/native');
   String _batteryLevel = 'Unknown battery level.';
 
   Future<Null> _getBatteryLevel() async {
     String batteryLevel;
     try {
+      //make call to device
       final int result = await platform.invokeMethod('getBatteryLevel');
       batteryLevel = 'Battery level at $result % .';
     } on PlatformException catch (e) {
@@ -62,10 +64,25 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _getBatteryLevel,
-        tooltip: 'get baterry level',
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton(
+            onPressed: _getBatteryLevel,
+            tooltip: 'get baterry level',
+            child: Icon(Icons.battery_unknown),
+          ),
+          Padding(padding: EdgeInsets.only(top: 5),),
+          FloatingActionButton(
+            onPressed: null,
+            child: Icon(Icons.add),
+          ),
+          Padding(padding: EdgeInsets.only(top: 5),),
+          FloatingActionButton(
+            onPressed: null,
+            child: Icon(Icons.add),
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

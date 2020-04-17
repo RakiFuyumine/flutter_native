@@ -18,7 +18,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
-  private static final String CHANNEL = "samples.flutter.io/battery";
+  private static final String CHANNEL = "samples.flutter.io/native";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -27,6 +27,7 @@ public class MainActivity extends FlutterActivity {
 
     new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
             (call, result) -> {
+              // implement code for each call
               if (call.method.equals("getBatteryLevel")) {
                 int batteryLevel = getBatteryLevel();
 
